@@ -12,16 +12,18 @@ function! ht#collection#lsp#entry_point()
   Shortcut 'nmap', 'gr', '<Plug>(coc-references)', 'lsp-references'
   Shortcut 'nmap', 'gR', '<Plug>(coc-rename)', 'lsp-rename'
   Shortcut 'nmap', 'gf', '<Plug>(coc-fix-current)', 'lsp-fix-current-line'
-  let tmp = s:SID()
-  NShortcut 'gk', ':call ' . tmp .'show_documentation()<CR>', 'lsp-doc'
+
+  NShortcut 'gk', ':call ht#collection#lsp#show_documentation()', 'lsp-doc'
 
   CategoryName 'l', '+list/search'
-  NShortcut 'ld', ':<C-u>CocList diagnostics<CR>', 'list-diagnostics'
-  NShortcut 'lo', ':<C-u>CocList outline<CR>', 'list-outline'
-  NShortcut 'ld', ':<C-u>CocList -I symbols<CR>', 'list-symbols'
-  NShortcut 'ln', ':<C-u>CocNext<CR>', 'list-next'
-  NShortcut 'lp', ':<C-u>CocPrev<CR>', 'list-prev'
-  NShortcut 'lr', ':<C-u>CocListResume<CR>', 'list-resume'
+  NShortcut 'ld', ':<C-u>CocList diagnostics', 'list-diagnostics'
+  NShortcut 'lo', ':<C-u>CocList outline', 'list-outline'
+  NShortcut 'ld', ':<C-u>CocList -I symbols', 'list-symbols'
+  NShortcut 'ln', ':<C-u>CocNext', 'list-next'
+  NShortcut 'lp', ':<C-u>CocPrev', 'list-prev'
+  NShortcut 'lr', ':<C-u>CocListResume', 'list-resume'
+
+  nnoremap <silent>;; :call <SID>context_menu()<CR>
 
   set updatetime=200
 
@@ -86,7 +88,7 @@ function! ht#collection#lsp#entry_point()
   set hidden
 endfunction
 
-function! s:show_documentation()
+function! ht#collection#lsp#show_documentation()
   if (index(['vim', 'help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
@@ -101,6 +103,21 @@ endfunction
 
 function! s:SID()
   return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction
+
+function! s:context_menu() abort
+  let content = [
+        \   [ "Goto &Definition", 'call feedkeys("\<Plug>(coc-definition)")' ],
+        \   [ "Goto T&ype Definition", 'call feedkeys("\<Plug>(coc-type-definition)")' ],
+        \   [ "Goto &Implementation", 'call feedkeys("\<Plug>(coc-implementation)")' ],
+        \   [ "Goto &References", 'call feedkeys("\<Plug>(coc-references)")' ],
+        \   ['-'],
+        \   [ "Help &Keyword", 'call ht#collection#lsp#show_documentation()' ],
+        \ ]
+
+  " set cursor to the last position
+  let opts = {'index':g:quickui#context#cursor}
+  call quickui#context#open(content, opts)
 endfunction
 
 

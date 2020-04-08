@@ -87,6 +87,25 @@ function! s:config() abort
 
   call ht#vim#window#add_uncountable_type(['defx', 'quickfix'])
   call ht#vim#window#enable_auto_close()
+
+  "#fb7da7 #FB7DA7	red (Tickle me pink)	Statement
+ " #a18bd3 #A18BD3	purple (Blue bell)	Identifier, function
+ " #ffce5b #FFCE5B	yellow (Mustard)	String
+ " #50c6d8 #50C6D8	cyan (Sea serpent)	Constant, Type
+ " #2cda9d #2CDA9D	green (Eucalyptus)	Special
+ " #4C8273 #4C8273	comment (Viridian)	Comment
+ " #1c1c1c #1c1c1c	menublack (Pale black)	Menu
+ " #818e8e #818E8E	grey (Mummys tomb)	Punctuation, noise
+ " #efeeea #EFEEEA	white (Isabelline)	Foreground
+ " #2f343f #2F343F	black (Raisin black)	Background
+
+  let g:quickui_border_style = 2
+  " TODO(hawtian): fix color
+  hi! QuickBG ctermfg=0 ctermbg=7 guifg=#EFEEEA guibg=#2F343F
+  " hi! QuickKey term=bold ctermfg=9 gui=bold guifg=#FFCE5B
+  " hi! QuickSel cterm=bold ctermfg=0 ctermbg=2 gui=bold guibg=#50c6d8 guifg=#A18BD3
+  " hi! QuickOff ctermfg=59 guifg=#4C8273
+  " hi! QuickHelp ctermfg=247 guifg=#959173
 endfunction
 
 function! s:key_map() abort
