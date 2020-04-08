@@ -18,9 +18,7 @@ function! ht#collection#default#entry_point() abort
         \   'on_cmd': ['Defx'],
         \ }
 
-  MyPlug 'liuchengxu/vim-which-key', {
-        \   'on_cmd': ['WhichKey', 'WhichKey!'],
-        \ }
+  MyPlug 'liuchengxu/vim-which-key'
 
   MyPlug 'flrnd/candid.vim'
 
@@ -149,6 +147,11 @@ function! s:key_map() abort
   NShortcut 'wl', ':call feedkeys("\<Plug>(window_l)")', 'window-right'
 
   nnoremap <silent><leader> :WhichKey '<Space>'<CR>
+  augroup WhichKeyGroup
+    autocmd! FileType which_key
+    autocmd  FileType which_key set laststatus=0 noshowmode noruler
+      \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+  augroup END
 endfunction
 
 function! s:toggle_defx() abort

@@ -10,10 +10,10 @@ function! ht#collection#lsp#entry_point()
   Shortcut 'nmap', 'gy', '<Plug>(coc-type-definition)', 'lsp-type-def'
   Shortcut 'nmap', 'gi', '<Plug>(coc-implementation)', 'lsp-implementation'
   Shortcut 'nmap', 'gr', '<Plug>(coc-references)', 'lsp-references'
-  Shortcut 'nnoremap', 'gk', ':call ' . <SID> .'show_documentation()<CR>',
-        \ 'lsp-doc'
   Shortcut 'nmap', 'gR', '<Plug>(coc-rename)', 'lsp-rename'
   Shortcut 'nmap', 'gf', '<Plug>(coc-fix-current)', 'lsp-fix-current-line'
+  let tmp = s:SID()
+  NShortcut 'gk', ':call ' . tmp .'show_documentation()<CR>', 'lsp-doc'
 
   CategoryName 'l', '+list/search'
   NShortcut 'ld', ':<C-u>CocList diagnostics<CR>', 'list-diagnostics'
@@ -57,7 +57,6 @@ function! ht#collection#lsp#entry_point()
         \ 'coc-git',
         \ 'coc-vimlsp',
         \ 'coc-fish',
-        \ 'coc-template',
         \ 'coc-highlight',
         \ ]
 
@@ -98,6 +97,10 @@ endfunction
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+function! s:SID()
+  return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
 endfunction
 
 
