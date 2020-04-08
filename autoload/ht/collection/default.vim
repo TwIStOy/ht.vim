@@ -1,5 +1,6 @@
 function! ht#collection#default#entry_point() abort
   call s:config()
+  call s:key_map()
 
   " compatible with some neovim only plugins
   MyPlug 'roxma/nvim-yarp'
@@ -21,11 +22,13 @@ function! ht#collection#default#entry_point() abort
         \   'on_cmd': ['WhichKey', 'WhichKey!'],
         \ }
 
-
-
+  MyPlug 'skywind3000/vim-quickui'
 endfunction
 
 function! s:config() abort
+  let g:mapleader = "\<Space>"
+  let g:maplocalleader = ','
+
   augroup htStartify
     autocmd!
     autocmd VimEnter *
@@ -69,8 +72,93 @@ function! s:config() abort
 
   set exrc
 
-  set scrolloff 5
+  set scrolloff=5
   set timeoutlen=500
 
+  call ht#vim#window#add_uncountable_type(['defx', 'quickfix'])
+  call ht#vim#window#enable_auto_close()
+endfunction
+
+function! s:key_map() abort
+  for l:i in range(1, 9)
+    NShortcut string(l:i),
+          \ ':call ht#vim#window#move_to(' . l:i . ')', 'Window ' . l:i
+  endfor
+
+  CategoryName 'f', '+file'
+  NShortcut 'fs', ':update', 'save'
+
+  let g:ht_defx_parameters = [
+      \ '-split=vertical',
+      \ '-winwidth=35',
+      \ '-ignored-files=*.d',
+      \ '-toggle',
+      \ ]
+  nnoremap <silent><Plug>(toggle_defx) :call <SID>toggle_defx()<CR>
+
+  NShortcut 'ft', ':call feedkeys("\<Plug>(toggle_defx)")',
+        \ 'toggle-file-explorer'
+
+  NShortcut 'q', ':q', 'quit'
+  NShortcut 'x', ':wq', 'save-and-quit'
+  NShortcut 'Q', ':qa!', 'force-quit'
+  NShortcut 'tq', ':call ht#vim#window#toggle_quickfix()', 'toggle-quickfix'
+
+  nnoremap <silent> <F2> :call <SID>fast_forward_to_file()<CR>
+
+  nnoremap <Plug>(window_w) <C-W>w
+  nnoremap <Plug>(window_r) <C-W>r
+  nnoremap <Plug>(window_d) <C-W>c
+  nnoremap <Plug>(window_q) <C-W>q
+  nnoremap <Plug>(window_j) <C-W>j
+  nnoremap <Plug>(window_k) <C-W>k
+  nnoremap <Plug>(window_h) <C-W>h
+  nnoremap <Plug>(window_l) <C-W>l
+  nnoremap <Plug>(window_H) <C-W>5<
+  nnoremap <Plug>(window_L) <C-W>5>
+  nnoremap <Plug>(window_J) :resize +5<CR>
+  nnoremap <Plug>(window_K) :resize -5<CR>
+  nnoremap <Plug>(window_b) <C-W>=
+  nnoremap <Plug>(window_s1) <C-W>s
+  nnoremap <Plug>(window_s2) <C-W>s
+  nnoremap <Plug>(window_v1) <C-W>v
+  nnoremap <Plug>(window_v2) <C-W>v
+  nnoremap <Plug>(window_2) <C-W>v
+  nnoremap <Plug>(window_x) <C-W>x
+  nnoremap <Plug>(window_p) <C-W>p
+
+  CategoryName 'w', '+window'
+  NShortcut 'wv', ':call feedkeys("\<Plug>(window_v1)")', 'split-window-right'
+  NShortcut "w-", ':call feedkeys("\<Plug>(window_s1)")', 'split-window-below'
+  NShortcut 'w=', ':call feedkeys("\<Plug>(window_b)")', 'balance-window'
+
+  NShortcut 'wr', ':call feedkeys("\<Plug>(window_r)")', 'rotate-windows-rightwards'
+  NShortcut 'wx', ':call feedkeys("\<Plug>(window_x)")', 'exchange-window-with-next'
+  NShortcut 'ww', ':call feedkeys("\<Plug>(window_w)")', 'move-to-next-window'
+
+  NShortcut 'wh', ':call feedkeys("\<Plug>(window_h)")', 'window-left'
+  NShortcut 'wj', ':call feedkeys("\<Plug>(window_j)")', 'window-down'
+  NShortcut 'wk', ':call feedkeys("\<Plug>(window_k)")', 'window-up'
+  NShortcut 'wl', ':call feedkeys("\<Plug>(window_l)")', 'window-right'
+
+  nnoremap <silent><leader> :WhichKey '<Space>'<CR>
+endfunction
+
+function! s:toggle_defx() abort
+  let cmd = join(g:ht_defx_parameters)
+  execute 'Defx ' . l:cmd
+endfunction
+
+function! s:fast_forward_to_file() abort
+  for l:i in range(1, winnr('$'))
+    let l:tp = getbufvar(winbufnr(l:i), '&ft')
+
+    if l:tp == 'defx'
+      execute ':' . l:i . 'wincmd w'
+      return
+    endif
+  endfor
+
+  call s:toggle_defx()
 endfunction
 
