@@ -23,6 +23,9 @@ function! ht#collection#default#entry_point() abort
   MyPlug 'flrnd/candid.vim'
 
   MyPlug 'skywind3000/vim-quickui'
+
+  call ht#builtin#defx#entry_point()
+  call ht#builtin#startify#entry_point()
 endfunction
 
 function! s:config() abort
