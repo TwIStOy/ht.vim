@@ -32,9 +32,6 @@ function! s:config() abort
   let g:mapleader = "\<Space>"
   let g:maplocalleader = ','
 
-  let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-  let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-
   " used for term color
   set term=xterm-256color
   set t_Co=256
