@@ -22,12 +22,18 @@ function! ht#collection#default#entry_point() abort
         \   'on_cmd': ['WhichKey', 'WhichKey!'],
         \ }
 
+  MyPlug 'flrnd/candid.vim'
+
   MyPlug 'skywind3000/vim-quickui'
 endfunction
 
 function! s:config() abort
   let g:mapleader = "\<Space>"
   let g:maplocalleader = ','
+
+  " used for term color
+  set term=xterm-256color
+  set t_Co=256
 
   augroup htStartify
     autocmd!
@@ -105,6 +111,7 @@ function! s:key_map() abort
   NShortcut 'tq', ':call ht#vim#window#toggle_quickfix()', 'toggle-quickfix'
 
   nnoremap <silent> <F2> :call <SID>fast_forward_to_file()<CR>
+  nnoremap <silent> <F3> :call <SID>select_buffer()<CR>
 
   nnoremap <Plug>(window_w) <C-W>w
   nnoremap <Plug>(window_r) <C-W>r
@@ -160,5 +167,14 @@ function! s:fast_forward_to_file() abort
   endfor
 
   call s:toggle_defx()
+endfunction
+
+function! s:select_buffer() abort
+  let opts = {'title': 'Select Buffers'}
+  let info = ht#vim#buffer#all_buffes_info()
+  if len(info) == 0
+    call add(info, "   <nobuffer>   ")
+  endif
+  call quickui#listbox#open(info, opts)
 endfunction
 
