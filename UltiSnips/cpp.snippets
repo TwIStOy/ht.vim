@@ -1,0 +1,269 @@
+global !p
+from cpp_snippet_helper import *
+from header_include_helper import generate_cpp_header_filename
+
+def write_docstring_args(arglist, snip):
+	args = str(arglist).split(',')
+
+	if len(args) > 1:
+		c = 0
+		for arg in args:
+			if c == 0:
+				snip.rv += arg
+				c = 1
+			else:
+				snip += ' * @param %s' % arg.strip()
+	else:
+		snip.rv = args[0]
+
+def defined_class_name(snip):
+	basename = snip.basename
+	if basename:
+		snip.rv = "".join([it.capitalize() for it in basename.split('_')])
+	else:
+		snip.rv = "name"
+
+def output_stream_generate(matched_str, snip):
+	args = [it.strip() for it in str(matched_str).split(',')]
+	snip.rv = ' << ", " << '.join(['"%s: " << %s' % (it, it) for it in args])
+
+def output_stream_generate_pair(matched_str, snip):
+	args = [it.strip() for it in str(matched_str).split(',')]
+	tmp = ' << ", " << '.join(['"%s: " << %s' % (it, it) for it in args])
+	snip.rv = '"(" << ' + tmp + ' << ")"'
+
+def output_format_generate(matched_str, snip):
+	args = [it.strip() for it in str(matched_str).split(',')]
+	fmt_str =  ', '.join(["%s: {}" % (it) for it in args])
+	args_str = ', '.join(args)
+	snip.rv = '"{}"_format({})'.format(fmt_str, args_str)
+
+endglobal
+
+snippet fnc "c++ function with doxygen comment" b
+/**
+ * @brief ${4:brief}
+ *
+ * @param `!p write_docstring_args(t[3],snip)`
+ *
+ * @return `!p snip.rv = t[1]`
+ */
+${1:ReturnType} ${2:FunctionName}(${3:param});
+endsnippet
+
+snippet cls "class ... (class)" b
+class ${1:`!p defined_class_name(snip)`} {
+ public:
+  $1(${2:args});
+	virtual ~$1() = default;
+
+ private:
+};
+endsnippet
+
+snippet "(\w[\w, .\->_]*?)\.oss" "convert to output stream ..." r
+`!p output_stream_generate(match.group(1), snip)`$0
+endsnippet
+
+snippet "\(([\w, .\->_]*?)\)\.oss" "convert to output stream with pair ..." r
+`!p output_stream_generate_pair(match.group(1), snip)`$0
+endsnippet
+
+snippet "(\w[\w, ]*?)\.p" "comment" b
+`!p snip.rv = "(" + match.group(1) + ")"`
+endsnippet
+
+snippet "(\w[\w,\s\->._]*?)\.fmt" "comment" r
+`!p output_format_generate(match.group(1), snip)`${0}
+endsnippet
+
+snippet ns "namespace with comment (namespace)"
+namespace${1/.+/ /m}${1:`!p snip.rv = snip.basename or "name"`} {
+  ${0:/* body */}
+}${1/.+/  \/\/ namespace /m}$1
+endsnippet
+
+snippet beginend "$1.begin(), $1.end() (beginend)"
+${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
+endsnippet
+
+snippet once "pragma once (pragma)"
+#pragma once  // NOLINT(build/header_guard)
+endsnippet
+
+snippet copyright "copyright"
+// Copyright (c) 2020 ${1}
+//
+
+${0}
+endsnippet
+
+# simple snippets {{{
+snippet sc "static_cast"
+static_cast<${1}>(${2})${0}
+endsnippet
+
+snippet dc "dynamic_cast"
+dynamic_cast<${1}>(${2})${0}
+endsnippet
+
+snippet rc "reinterpret_cast"
+reinterpret_cast<${1}>(${2})${0}
+endsnippet
+
+snippet cc "const_cast"
+const_cast<${1}>(${2})${0}
+endsnippet
+
+snippet inc "#include"
+#include "${1}"${0}
+endsnippet
+
+snippet incc "#include<>"
+#include <${1}>${0}
+endsnippet
+
+snippet fin "for...in"
+for (auto& iter : ${1}) {
+  ${0}
+}
+endsnippet
+
+snippet cfin "const...for...in"
+for (const auto& iter : ${1}) {
+  ${0}
+}
+endsnippet
+
+snippet map "std::map"
+std::map<${1:key}, ${2:value}> ${0:name};
+endsnippet
+
+snippet umap "std::unordered_map"
+std::unordered_map<${1:key}, ${2:value}> ${0:name};
+endsnippet
+
+snippet vec "std::vector"
+std::vector<${1:type}> ${0:name};
+endsnippet
+
+snippet nuptr "std::unique_ptr"
+std::unique_ptr<${1:type}>(new $1{${2:args}})${0}
+endsnippet
+
+snippet todo "TODO comments" b
+// TODO(hawtian): ${0}
+endsnippet
+
+snippet fixme "FIXME comments" b
+// FIXME(hawtian): ${0}
+endsnippet
+
+# }}}
+
+snippet getter "getter..." b
+inline $1 $3::Get`!p snip.rv = underscore_to_big_camel_case(t[2])`() const {
+  return $2;
+}
+endsnippet
+
+snippet sl "SAFE_LOG2" b
+SAFE_LOG2(Info) << ${0}
+endsnippet
+
+snippet ll "LOCAL_LOG" b
+LOCAL_LOG(Info) << ${0}
+endsnippet
+
+# common types-alias
+snippet "(p(?:(?:(?=\()\([pius0-9\()]+\s*(?:,\s*[pius0-9()]+)+\))|[ius]{2}))" "convert to std::pair or tuple format..." r
+`!p snip.rv = short_nameset_parse(match.group(1))`$0
+endsnippet
+
+post_jump "expand_anon(snip)"
+snippet "@\[(.*?)\]" "all helper functions..." r
+`!p function_helpers(match.group(1), snip)`
+endsnippet
+
+snippet inh "include corresponding header..." b
+`!p snip.rv = generate_cpp_header_filename(vim)`$0
+endsnippet
+
+post_jump "expand_anon(snip)"
+snippet "ns\s+([\w_]+(::[\w_]+)*)" "simple namespace generator..." r
+`!p snip.rv = simple_namespace_generate(match.group(1), snip)`
+endsnippet
+
+snippet ulk "std::unqiue_lock<shared_mutex>" b
+std::unique_lock<SharedMutex> ${2:lk}(${1:mutex_});
+${0}
+endsnippet
+
+snippet slk "shared_lock<shared_mutex>" b
+SharedLock<SharedMutex> ${2:lk}(${1:mutex_});
+${0}
+endsnippet
+
+snippet itf "cpp interface common" b
+struct ${1:InterfaceName} {
+	${0}
+	virtual ~$1() = default;
+};
+endsnippet
+
+snippet vf "virtual function" b
+virtual ${3:ReturnType} ${1:FunctionName}(${2:args})${0};
+endsnippet
+
+snippet pvf "pure virtual function" b
+virtual ${3:ReturnType} ${1:FunctionName}(${2:args}) ${4} = 0;${0}
+endsnippet
+
+snippet "([iu])(\d+)" "int types..." r
+`!p simple_int_types(match.group(1), match.group(2), snip)` ${0}
+endsnippet
+
+post_jump "expand_anon(snip)"
+snippet cguard "c styple header guard" b
+`!p snip.rv = cpp_c_style_header_guard(path)`
+endsnippet
+
+snippet externc "extern c guard for cpp" b
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+${0: /* body */}
+
+#ifdef __cplusplus
+}
+#endif
+endsnippet
+
+snippet ==a "ASSERT_EQ" b
+ASSERT_EQ(${1:lhs}, ${2:rhs});${0}
+endsnippet
+
+snippet !=a "ASSERT_NE" b
+ASSERT_NE(${1:lhs}, ${2:rhs});${0}
+endsnippet
+
+snippet ==e "EXPECT_EQ" b
+EXPECT_EQ(${1:lhs}, ${2:rhs});${0}
+endsnippet
+
+snippet !=e "EXPECT_NE" b
+EXPECT_NE(${1:lhs}, ${2:rhs});${0}
+endsnippet
+
+snippet find "find function in map" b
+auto it = ${1:map name}.find(${2:key});
+if (it == $1.end()) {
+	${3:not exists block}
+} else {
+	${4:exists block}
+}
+endsnippet
+
+# vim: set fdm=marker
+

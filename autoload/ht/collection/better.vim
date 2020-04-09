@@ -24,6 +24,8 @@ function! ht#collection#better#entry_point() abort
   " TODO(hawtian): maybe lazy load
   MyPlug 'RRethy/vim-illuminate'
   MyPlug 'andymass/vim-matchup'
+
+  MyPlug 'TwIStOy/conflict-resolve.nvim'
 endfunction
 
 function! s:config() abort
@@ -66,16 +68,21 @@ function! s:config() abort
   CategoryName 'r', '+rg'
 
   " key mappings {{{
-  NShortcut 'e', ':Leaderf file<CR>', 'edit[ pwd ]'
-  NShortcut 'ff', ':Leaderf file ~<CR>', 'edit[ $HOME ]'
-  NShortcut 'fr', ':LeaderfMru<CR>', 'edit-recent-file'
-  NShortcut 'bb', ':LeaderfBuffer<CR>', 'buffer-list'
-  NShortcut 'rg', ':LeaderfRgInteractive<CR>', 'rg'
+  NShortcut 'e', ':Leaderf file', 'edit[ pwd ]'
+  NShortcut 'ff', ':Leaderf file ~', 'edit[ $HOME ]'
+  NShortcut 'fr', ':LeaderfMru', 'edit-recent-file'
+  NShortcut 'bb', ':LeaderfBuffer', 'buffer-list'
+  NShortcut 'rg', ':LeaderfRgInteractive', 'rg'
 
-  NShortcut 'rr', ':LeaderfRgRecall<CR>', 'rr'
+  NShortcut 'rr', ':LeaderfRgRecall', 'rr'
 
-  Shortcut 'xmap', 'ta', ':EasyAlign<CR>', 'easy-align'
-  Shortcut 'nmap', 'ta', ':EasyAlign<CR>', 'easy-align'
+  Shortcut 'xmap', 'ta', ':EasyAlign', 'easy-align'
+  Shortcut 'nmap', 'ta', ':EasyAlign', 'easy-align'
+
+  NShortcut 'v1', ':call conflict_resolve#ourselves()', 'diff-use-above'
+  NShortcut 'v2', ':call conflict_resolve#themselves()', 'diff-use-bottom'
+  NShortcut 'vb', ':call conflict_resolve#both()', 'diff-use-both'
+
   " }}}
 
   set showtabline=2
