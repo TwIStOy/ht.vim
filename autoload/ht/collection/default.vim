@@ -106,6 +106,8 @@ function! s:config() abort
 endfunction
 
 function! s:key_map() abort
+  nnoremap <silent>;; :call ht#quickui#open_context(&ft)<CR>
+
   for l:i in range(1, 9)
     NShortcut string(l:i),
           \ ':call ht#vim#window#move_to(' . l:i . ')', 'Window ' . l:i

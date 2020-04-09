@@ -4,30 +4,7 @@ function! ht#collection#better#entry_point() abort
   MyPlug 'tpope/vim-surround'
   MyPlug 'tpope/vim-repeat'
 
-  MyPlug 'Yggdroot/LeaderF', {
-      \ 'on_cmd': ['Leaderf',
-      \            "LeaderfFile",
-      \            "LeaderfBuffer",
-      \            "LeaderfBufferAll",
-      \            "LeaderfMru",
-      \            "LeaderfMruCwd",
-      \            "LeaderfTag",
-      \            "LeaderfBufTag",
-      \            "LeaderfBufTagAll",
-      \            "LeaderfFunction",
-      \            "LeaderfFunctionAll",
-      \            "LeaderfLine",
-      \            "LeaderfLineAll",
-      \            "LeaderfHistoryCmd",
-      \            "LeaderfHistorySearch",
-      \            "LeaderfSelf",
-      \            "LeaderfHelp",
-      \            "LeaderfColorscheme",
-      \            "LeaderfRgInteractive",
-      \            "LeaderfRgRecall"
-      \           ],
-      \ 'build': './install.sh',
-      \ }
+  MyPlug 'Yggdroot/LeaderF', { 'build': './install.sh', }
 
   MyPlug 'tenfyzhong/axring.vim'
   MyPlug 'Yggdroot/indentLine', { 'on_ft': ['python'] }

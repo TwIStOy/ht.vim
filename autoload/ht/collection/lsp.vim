@@ -23,7 +23,7 @@ function! ht#collection#lsp#entry_point()
   NShortcut 'lp', ':<C-u>CocPrev', 'list-prev'
   NShortcut 'lr', ':<C-u>CocListResume', 'list-resume'
 
-  nnoremap <silent>;; :call <SID>context_menu()<CR>
+  call s:context_menu()
 
   set updatetime=200
 
@@ -114,10 +114,7 @@ function! s:context_menu() abort
         \   ['-'],
         \   [ "Help &Keyword", 'call ht#collection#lsp#show_documentation()' ],
         \ ]
-
-  " set cursor to the last position
-  let opts = {'index':g:quickui#context#cursor}
-  call quickui#context#open(content, opts)
+  call ht#quickui#append_context_menu(content, 'cpp')
 endfunction
 
 
