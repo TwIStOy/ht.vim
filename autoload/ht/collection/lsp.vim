@@ -1,6 +1,6 @@
 function! ht#collection#lsp#entry_point()
   MyPlug 'neoclide/coc.nvim', {
-        \ 'build': 'yarn install',
+        \  'rev': 'release',
         \ }
 
   CategoryName 'g', '+goto/lsp'
@@ -40,7 +40,11 @@ function! ht#collection#lsp#entry_point()
   nmap <silent> [c <plug>(coc-diagnostic-prev)
   nmap <silent> ]c <plug>(coc-diagnostic-prev)
 
-  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<cr>"
+  if exists('*complete_info')
+    inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+  else
+    imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+  endif
 
   inoremap <silent><expr> <TAB>
         \ pumvisible() ? "\<C-n>" : "\<TAB>"
@@ -86,6 +90,9 @@ function! ht#collection#lsp#entry_point()
   set shortmess+=c
   set signcolumn=yes
   set hidden
+
+  set nobackup
+  set nowritebackup
 endfunction
 
 function! ht#collection#lsp#show_documentation()

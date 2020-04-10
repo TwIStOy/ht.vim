@@ -36,6 +36,8 @@ function! s:config() abort
   set term=xterm-256color
   set t_Co=256
 
+  set hls
+
   augroup htStartify
     autocmd!
     autocmd VimEnter *
